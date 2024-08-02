@@ -9,6 +9,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.title("IMDB API")
     name = st.text_input("Movie Name")
+
     if st.button("Submit"):
         name_split = name.split()
         length = len(name_split)
@@ -25,27 +26,52 @@ with col1:
             template = template + f"{name_split[k]}+"
 
         template = template[:-1]
+        # GET MOVIE DATA
+        key1 = '329578fe'
+        url1 = f"https://www.omdbapi.com/?apikey=329578fe&t={template}"
+        response1 = requests.get(url1)
+        data1 = response1.json()
 
-        key = '329578fe'
-        url = f"https://www.omdbapi.com/?apikey=329578fe&t={template}"
-        response = requests.get(url)
-        data = response.json()
+        # GET STREAMING DATA
+        url2 = f"https://streaming-availability.p.rapidapi.com/shows/search/title"
+        querystring = {"country": "us", "title": f"{name}", "series_granularity": "show", "show_type": "movie", "output_language": "en"}
+        headers = {
+            "x-rapidapi-key": "1b6ce2494dmshf74f9c461b4cdbbp1d3b11jsndd6ab0d8575c",
+            "x-rapidapi-host": "streaming-availability.p.rapidapi.com"
+        }
 
-        st.image(data['Poster'])
+        response2 = requests.get(url2, headers=headers, params=querystring)
+        data2 = response2.json()
+
+        st.image(data1['Poster'])
 
         with col2:
-            st.write("Title: " + data["Title"])
-            st.write("Year: " + data["Year"])
-            st.write("Rated: " + data["Rated"])
-            st.write("Released: " + data["Released"])
-            st.write("Runtime: " + data["Runtime"])
-            st.write("Genre: " + data["Genre"])
-            st.write("Director: " + data["Director"])
-            st.write("Writer: " + data["Writer"])
-            st.write("Actors: " + data["Actors"])
-            st.write("Plot: " + data["Plot"])
-            st.write("Language: " + data["Language"])
-            st.write("Country: " + data["Country"])
-            st.write("Awards: " + data["Awards"])
+            st.write("Title: " + data1["Title"])
+            st.write("Year: " + data1["Year"])
+            st.write("Rated: " + data1["Rated"])
+            st.write("Released: " + data1["Released"])
+            st.write("Runtime: " + data1["Runtime"])
+            st.write("Genre: " + data1["Genre"])
+            st.write("Director: " + data1["Director"])
+            st.write("Writer: " + data1["Writer"])
+            st.write("Actors: " + data1["Actors"])
+            st.write("Plot: " + data1["Plot"])
+            st.write("Language: " + data1["Language"])
+            st.write("Country: " + data1["Country"])
+            st.write("Awards: " + data1["Awards"])
 
+            services = []
+            try:
+                services.append(data2[0]["streamingOptions"]["us"][0]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][1]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][2]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][3]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][4]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][5]["service"]["name"])
+                services.append(data2[0]["streamingOptions"]["us"][6]["service"]["name"])
+            except IndexError:
+                st.write('No Streaming Services')
+            except KeyError:
+                st.write('No Streaming Services')
 
+            st.write(services)
