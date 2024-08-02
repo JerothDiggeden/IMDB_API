@@ -61,17 +61,15 @@ with col1:
             st.write("Awards: " + data1["Awards"])
 
             services = []
-            try:
-                services.append(data2[0]["streamingOptions"]["us"][0]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][1]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][2]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][3]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][4]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][5]["service"]["name"])
-                services.append(data2[0]["streamingOptions"]["us"][6]["service"]["name"])
-            except IndexError:
-                st.write('No Streaming Services')
-            except KeyError:
-                st.write('No Streaming Services')
+            for v in data2[0]["streamingOptions"]["us"]:
+                if 'name' in v["service"]:
+                    services.append(v["service"]["name"])
+                else:
+                    continue
 
-            st.write(services)
+            services = str(set(services))
+            services = services.replace("'", "")
+            services = services.replace("{", "")
+            services = services.replace("}", "")
+
+            st.write("Streaming On: ", services)
